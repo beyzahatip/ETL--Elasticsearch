@@ -1,0 +1,57 @@
+﻿@model IEnumerable<ETL_Haritha.Models.Employee>
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>ETL</h1>
+
+
+<form method="get" asp-action="Index">
+    <p>
+        <input type="search" placeholder="Enter employee name or title" name="Empsearch" value="@ViewData["Getemployeedetails"]" style="width:280px;"/>
+        <input type="submit" class="btn btn-primary"  value="Search" />
+        <a asp-action="Index">Get All Employees</a>
+    </p>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.firstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.lastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.title)
+            </th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+            {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.firstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.lastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.title)
+            </td>
+        </tr>
+            }
+    </tbody>
+    
+</table>
