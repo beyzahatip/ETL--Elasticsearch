@@ -7,12 +7,35 @@
 }
 <h1>ETL</h1>
 
+<div class="filter-by">
+    <div class="row" style="width:100%; margin:0 !important">
+        <div class="col-md-4">
+            <h5>Fields</h5>
+            <div class="dropdown">
+                <button class="btn btn-outline-warning dropdown-toggle" type="button" id="titleDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Title
+                </button>
+                <div class="dropdown-menu" aria-labelledby="titleDropdownButton">
+                    <a class="dropdown-item draggable" href="#">Web</a>
+                    <a class="dropdown-item draggable" href="#">Java</a>
+                    <a class="dropdown-item draggable" href="#">Android</a>
+                </div>
+            </div>
+
+        </div>
+        <div class="drop-container col-md-8">
+            <span class="drop-placeholder">Filter By</span>
+        </div>
+    </div>
+</div>
+<br /><br />
+
 
 <form method="get" asp-action="Index">
     <p>
-        <input type="search" placeholder="Enter employee name or title" name="Empsearch" value="@ViewData["Getemployeedetails"]" style="width:280px;"/>
-        <input type="submit" class="btn btn-primary"  value="Search" />
-        <a asp-action="Index">Get All Employees</a>
+        <input type="search" placeholder="Enter employee name or title" name="Empsearch" value="@ViewData["Getemployeedetails"]" style="width:280px;" />
+        <input type="submit" class="btn btn btn-info" value="Search" />
+        <a asp-action="Index" style="color:#17a2b8">Get All Employees</a>
     </p>
 </form>
 <table class="table">
@@ -27,31 +50,115 @@
             <th>
                 @Html.DisplayNameFor(model => model.lastName)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.title)
+            <th class="droppable" id="titleColumn">
+                <div style="display: flex; align-items: center;">
+                    @Html.DisplayNameFor(model => model.title)
+                    <div class="drop-container-min">
+                        <span class="drop-placeholder">Drag Here</span>
+                    </div>
+                </div>
             </th>
-
-
         </tr>
     </thead>
-    <tbody>
-    @foreach (var item in Model)
-            {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.firstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.lastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.title)
-            </td>
-        </tr>
-            }
+    <tbody id="employeeTableBody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.firstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.lastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.title)
+                </td>
+            </tr>
+        }
     </tbody>
-    
 </table>
+<style>
+    .drag-container {
+        padding: 10px;
+        background-color: #F5F5F5;
+    }
+
+    .filter-by {
+        padding: 10px;
+        background-color: #F8F8F8;
+        //display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .filter-by-title {
+        text-align: center;
+    }
+
+    
+
+    .drop-container {
+        min-height: 100px;
+        border: 2px dashed #CCC;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .drop-placeholder {
+        color: #AAA;
+        font-weight: bold;
+    }
+    .drop-container-min {
+        width:120px;
+        border: 2px dashed #CCC;
+        text-align: center;
+        padding: 0;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $(".draggable").draggable({
+                helper: "clone"
+            });
+
+            $(".drop-container").droppable({
+                drop: function (event, ui) {
+                    var draggedTitle = ui.helper.text().trim();
+                    $.ajax({
+                        url: "/Employee/FilterByTitle",
+                        type: "POST",
+                        data: { title: draggedTitle },
+                        success: function (result) {
+                            $("#employeeTableBody").html(result);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+            $(".drop-container-min").droppable({
+                drop: function (event, ui) {
+                    var draggedTitle = ui.helper.text().trim();
+                    $.ajax({
+                        url: "/Employee/FilterByTitle",
+                        type: "POST",
+                        data: { title: draggedTitle },
+                        success: function (result) {
+                            $("#employeeTableBody").html(result);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
