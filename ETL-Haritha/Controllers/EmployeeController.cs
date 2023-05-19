@@ -32,5 +32,12 @@ namespace ETL_Haritha.Controllers
             }
             return View(await empquery.AsNoTracking().ToListAsync());
         }
+
+        [HttpPost]
+        public IActionResult FilterByTitle(string title)
+        {
+            var filteredData = _db.EmployeeTable.Where(x => x.title.Contains(title)).ToList();
+            return PartialView("_EmployeeTable", filteredData);
+        }
     }
 }
