@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 
 namespace ETL_Haritha
 {
@@ -23,11 +24,14 @@ namespace ETL_Haritha
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MyConnection")));
+
+           
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +61,16 @@ namespace ETL_Haritha
    
                     pattern: "{controller=Employee}/{action=Index}/{id?}");
             });
+        }
+
+        private class SingleNodeConnectionPool
+        {
+            private Uri uri;
+
+            public SingleNodeConnectionPool(Uri uri)
+            {
+                this.uri = uri;
+            }
         }
     }
 }

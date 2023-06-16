@@ -19,6 +19,7 @@ namespace ETL_Haritha.Controllers
             _db = db;
             var settings = new ConnectionSettings(new Uri("http://localhost:9200")).
                 DefaultMappingFor<Employee>(m => m.IndexName("employee-index"))
+                //Burada kendi elastic username ve passwordunuzu BasicAuthentication kısmına ve oluşturduğunuzda gelen fingerprinti de CertificateFingerprint içerisine yazmalısınız
             .CertificateFingerprint("3e8456a26af11c4531c6dfb58e75c664140949264c3664f5679a085891a55f58")
                 .BasicAuthentication("elastic", "K7AbrXX9s_K5jNtlRG4K");
             _elasticClient = new ElasticClient(settings);
@@ -45,28 +46,6 @@ namespace ETL_Haritha.Controllers
             return View(displayData);
         }
 
-
-        public IActionResult ElasticsearchIndex()
-        {
-            // Elasticsearch Employee endeksi oluşturma
-            _elasticClient.Indices.Create("employee-index", index => index
-                .Map<Employee>(m => m.AutoMap())
-            );
-
-            // Verileri Elasticsearch'e yükleme
-            var employees = _db.EmployeeTable.ToList();
-
-            foreach (var employee in employees)
-            {
-                var indexResponse = _elasticClient.IndexDocument(employee);
-                if (!indexResponse.IsValid)
-                {
-                    // İşlem başarısız oldu
-                }
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
 
         [HttpPost]
         public IActionResult ElasticsearchSearch(string query)
@@ -173,35 +152,9 @@ namespace ETL_Haritha.Controllers
 
         
 
-        //[HttpPost]
-        //public IActionResult FilterByTitle(string title)
-        //{
-        //    var filteredData = _db.EmployeeTable.Where(x => x.title.Contains(title)).ToList();
-        //    return PartialView("_EmployeeTable", filteredData);
-        //}
+        
 
-        //public IActionResult FilterByExperience(string operation, string value)
-        //{
-        //    List<Employee> filteredData;
-
-        //    switch (operation)
-        //    {
-        //        case ">":
-        //            filteredData = _db.EmployeeTable.Where(x => x.experience > int.Parse(value)).ToList();
-        //            break;
-        //        case "<":
-        //            filteredData = _db.EmployeeTable.Where(x => x.experience < int.Parse(value)).ToList();
-        //            break;
-        //        case "=":
-        //            filteredData = _db.EmployeeTable.Where(x => x.experience == int.Parse(value)).ToList();
-        //            break;
-        //        default:
-        //            filteredData = new List<Employee>();
-        //            break;
-        //    }
-
-        //    return PartialView("_EmployeeTable", filteredData);
-        //}
+       
 
 
 
