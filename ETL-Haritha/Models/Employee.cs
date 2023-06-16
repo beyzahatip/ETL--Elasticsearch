@@ -22,6 +22,11 @@ namespace ETL_Haritha.Models
         [Required(ErrorMessage = "Enter Employee's Title")]
         [Display(Name = "Employee Title")]
         public string title { get; set; }
+
+        [Required(ErrorMessage = "Enter Employee's Experience")]
+        [Display(Name = "Employee Experience")]
+        public int experience { get; set; }
+
     }
 
 }

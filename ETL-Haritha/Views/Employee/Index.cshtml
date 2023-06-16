@@ -1,43 +1,63 @@
 ﻿@model IEnumerable<ETL_Haritha.Models.Employee>
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @{
     ViewData["Title"] = "Index";
 }
 <h1>ETL</h1>
-
-<div class="filter-by">
-    <div class="row" style="width:100%; margin:0 !important">
-        <div class="col-md-4">
-            <h5>Fields</h5>
-            <div class="dropdown">
-                <button class="btn btn-outline-warning dropdown-toggle" type="button" id="titleDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Title
-                </button>
-                <div class="dropdown-menu" aria-labelledby="titleDropdownButton">
-                    <a class="dropdown-item draggable" href="#">Web</a>
-                    <a class="dropdown-item draggable" href="#">Java</a>
-                    <a class="dropdown-item draggable" href="#">Android</a>
-                </div>
-            </div>
-
-        </div>
-        <div class="drop-container col-md-8">
-            <span class="drop-placeholder">Filter By</span>
+<div class="row">
+    <div class="col-md-6 parent">
+        <div class="absolute">
+            <form method="get" asp-action="Index">
+                <p>
+                    <input type="search" placeholder="Enter employee name or title" name="Empsearch" value="@ViewData["Getemployeedetails"]" style="width:280px;" />
+                    <input type="submit" class="btn btn btn-info" value="Search" />
+                    <a asp-action="Index" style="color:#17a2b8">Get All Employees</a>
+                </p>
+            </form>
         </div>
     </div>
+    <div class="filter-by col-md-6">
+        <h4>Filtering Tools</h4>
+        <div class="row" style="width:100%; margin:0 !important">
+            <div class="col-md-6">
+                <h5>Fields</h5>
+                <div class="dropdown">
+                    <button class="btn btn-outline-warning dropdown-toggle" type="button" id="titleDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Title
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="titleDropdownButton">
+                        <a class="dropdown-item draggable" href="#">Web</a>
+                        <a class="dropdown-item draggable" href="#">Java</a>
+                        <a class="dropdown-item draggable" href="#">Android</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5>Operations</h5>
+                <div class="dropdown">
+                    <button class="btn btn-outline-warning dropdown-toggle" type="button" id="operationsDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Operations for Experience
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="operationsDropdownButton">
+                        <a class="dropdown-item draggable" href="#">></a>
+                        <a class="dropdown-item draggable" href="#"><</a>
+                        <a class="dropdown-item draggable" href="#">=</a>
+                    </div>
+                </div>
+            </div>
+            @*<div class="drop-container col-md-4">
+                    <span class="drop-placeholder">Filter By</span>
+                </div>*@
+
+        </div>
+    </div>
+   
+
 </div>
 <br /><br />
 
 
-<form method="get" asp-action="Index">
-    <p>
-        <input type="search" placeholder="Enter employee name or title" name="Empsearch" value="@ViewData["Getemployeedetails"]" style="width:280px;" />
-        <input type="submit" class="btn btn btn-info" value="Search" />
-        <a asp-action="Index" style="color:#17a2b8">Get All Employees</a>
-    </p>
-</form>
+
+
 <table class="table">
     <thead>
         <tr>
@@ -54,6 +74,14 @@
                 <div style="display: flex; align-items: center;">
                     @Html.DisplayNameFor(model => model.title)
                     <div class="drop-container-min">
+                        <span class="drop-placeholder">Drag Here</span>
+                    </div>
+                </div>
+            </th>
+            <th class="droppable" id="experienceColumn">
+                <div style="display: flex; align-items: center;">
+                    Experience
+                    <div id="dragExperience" class="drop-container-min">
                         <span class="drop-placeholder">Drag Here</span>
                     </div>
                 </div>
@@ -76,11 +104,26 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.title)
                 </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.experience)
+                </td>
             </tr>
         }
     </tbody>
 </table>
 <style>
+    div.parent {
+        position: relative;
+        height: 200px;
+        
+    }
+
+    div.absolute {
+        position: absolute;
+        width: 50%;
+        bottom: 0;
+        
+    } 
     .drag-container {
         padding: 10px;
         background-color: #F5F5F5;
@@ -89,17 +132,13 @@
     .filter-by {
         padding: 10px;
         background-color: #F8F8F8;
-        //display: flex;
         justify-content: center;
         align-items: center;
     }
 
-
     .filter-by-title {
         text-align: center;
     }
-
-    
 
     .drop-container {
         min-height: 100px;
@@ -112,8 +151,9 @@
         color: #AAA;
         font-weight: bold;
     }
+
     .drop-container-min {
-        width:120px;
+        width: 120px;
         border: 2px dashed #CCC;
         text-align: center;
         padding: 0;
@@ -127,11 +167,11 @@
                 helper: "clone"
             });
 
-            $(".drop-container").droppable({
+            $("#titleColumn").droppable({
                 drop: function (event, ui) {
                     var draggedTitle = ui.helper.text().trim();
                     $.ajax({
-                        url: "/Employee/FilterByTitle",
+                        url: "/Employee/ElasticsearchFilterByTitle",
                         type: "POST",
                         data: { title: draggedTitle },
                         success: function (result) {
@@ -143,18 +183,44 @@
                     });
                 }
             });
-            $(".drop-container-min").droppable({
+
+            $("#dragExperience").droppable({
                 drop: function (event, ui) {
-                    var draggedTitle = ui.helper.text().trim();
-                    $.ajax({
-                        url: "/Employee/FilterByTitle",
-                        type: "POST",
-                        data: { title: draggedTitle },
-                        success: function (result) {
-                            $("#employeeTableBody").html(result);
+                    var draggedOperation = ui.helper.text().trim();
+                    var operation = draggedOperation;
+                   
+
+                    // Create an input element dynamically
+                    var inputElement = $("<input>").attr("type", "text");
+
+                    // Show a modal dialog with the input element
+                    inputElement.dialog({
+                        title: "Enter a value",
+                        modal: true,
+                        buttons: {
+                            OK: function () {
+                                var inputValue = inputElement.val();
+                                if (inputValue != null && inputValue.trim() !== "") {
+                                    $.ajax({
+                                        url: "/Employee/ElasticsearchFilterByExperience",
+                                        type: "POST",
+                                        data: { operation: operation, value: inputValue },
+                                        success: function (result) {
+                                            $("#employeeTableBody").html(result);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.log(error);
+                                        }
+                                    });
+                                }
+                                inputElement.dialog("close");
+                            },
+                            Cancel: function () {
+                                inputElement.dialog("close");
+                            }
                         },
-                        error: function (xhr, status, error) {
-                            console.log(error);
+                        close: function () {
+                            inputElement.dialog("destroy").remove();
                         }
                     });
                 }
